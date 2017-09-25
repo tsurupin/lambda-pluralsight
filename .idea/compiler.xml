@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="lambda-pluralsight" />
+        <module name="spark-lambda" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="lambda-pluralsight" target="1.5" />
+      <module name="spark-lambda" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
