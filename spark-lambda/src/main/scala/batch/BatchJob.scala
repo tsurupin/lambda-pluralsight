@@ -4,21 +4,15 @@ import java.lang.management.ManagementFactory
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.sql.SQLContext
 import domain._
-
+import utils.SparkUtils._
 /**
   * Created by tomoakitsuruta on 9/24/17.
   */
 object BatchJob {
   def main (args: Array[String]): Unit = {
+    val sc = getSparkContext("Lambda with Spark")
 
-    val conf = new SparkConf().setAppName("Lambda with Spark")
-
-    if (ManagementFactory.getRuntimeMXBean.getInputArguments.toString.contains("IntelliJ IDEA")) {
-      conf.setMaster("local[*]")
-    }
-
-    val sc = new SparkContext(conf)
-    implicit val sqlContext = new SQLContext(sc)
+    val sqlContext = getSQLContext(sc)
 
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._

@@ -5,6 +5,7 @@ import java.io.FileWriter
 import config.Settings
 import org.apache.commons.io.FileUtils
 import scala.util.Random
+import org.apache.kafka,clients.producer.{KafkaOriducer, Prouducer, ProducerConfig, ProducerRecord}
 
 /**
   * Created by Ahmad Alkilani on 4/30/2016.
@@ -19,6 +20,18 @@ object LogProducer extends App {
   val Pages = (0 to wlc.pages).map("Page-" + _)
 
   val rnd = new Random()
+
+  val topic = "weblogs-text"
+  val props = new Properties()
+
+  props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localehost:9092")
+  props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+  props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+  props.put(ProducerConfig.ACKS_CONFIG, "all")
+  props.put(ProducerConfig.CLIENT_ID_CONFIG, "WeblogProducer")
+
+  val kafkaProducer: Producer[Nothing, String] = new KafkaProducer[Nothing, String](props)
+  println(kafkaProducer.partitionsFor(topic))
   val filePath = wlc.filePath
   val destPath = wlc.destPath
 
@@ -52,6 +65,8 @@ object LogProducer extends App {
 
       val line = s"$adjustedTimestamp\t$referrer\t$action\t$prevPage\t$visitor\t$page\t$product\n"
       fw.write(line)
+      val producerRecord = new ProducerRecord(topic, line)
+      kafkaProducer.send(producerRecord)
 
       if (iteration % incrementTimeEvery == 0) {
         println(s"Sent $iteration messages!")
@@ -68,5 +83,6 @@ object LogProducer extends App {
     FileUtils.moveFile(FileUtils.getFile(filePath), outputFile)
     val sleeping = 5000
     println(s"Sleeping for $sleeping ms")
+    kafkaProducer.close()
   }
 }
